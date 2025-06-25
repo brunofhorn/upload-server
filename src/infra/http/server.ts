@@ -5,10 +5,10 @@ import fastifySwaggerUi from '@fastify/swagger-ui'
 import { fastify } from 'fastify'
 import {
   hasZodFastifySchemaValidationErrors,
-  jsonSchemaTransform,
   serializerCompiler,
   validatorCompiler,
 } from 'fastify-type-provider-zod'
+import { transformSwaggerSchema } from './transform-swagger-schema'
 
 const server = fastify()
 
@@ -23,8 +23,6 @@ server.setErrorHandler((error, _request, reply) => {
     })
   }
 
-  console.error(error)
-
   return reply.status(500).send({ message: 'Internal server error.' })
 })
 
@@ -37,7 +35,7 @@ server.register(fastifySwagger, {
       version: '1.0.0',
     },
   },
-  transform: jsonSchemaTransform,
+  transform: transformSwaggerSchema,
 })
 
 server.register(fastifySwaggerUi, {
