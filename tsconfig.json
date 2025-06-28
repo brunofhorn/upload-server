@@ -5,12 +5,10 @@
 
   "compilerOptions": {
     "lib": [
-      "es2024",
-      "ESNext.Array",
-      "ESNext.Collection",
-      "ESNext.Iterator",
-      "ESNext.Promise"
+      "es2024"
     ],
+    "types": ["node"],
+
     "module": "esnext",
     "target": "esnext",
 
@@ -18,8 +16,9 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "moduleResolution": "bundler",
+
     "paths": {
-      "@/*":["./src/*"]
+      "@/*": ["./src/*"]
     }
   }
 }

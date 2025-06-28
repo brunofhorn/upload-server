@@ -1,7 +1,18 @@
+import type { FastifyRequest } from 'fastify'
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { getUploads } from '@/app/functions/get-uploads'
 import { unwrapEither } from '@/infra/shared/either'
+
+const querystringSchema = z.object({
+  searchQuery: z.string().optional(),
+  sortBy: z.enum(['createdAt']).optional(),
+  sortDirection: z.enum(['asc', 'desc']).optional(),
+  page: z.coerce.number().optional().default(1),
+  pageSize: z.coerce.number().optional().default(20),
+})
+
+type QuerystringType = z.infer<typeof querystringSchema>
 
 export const getUploadsRoute: FastifyPluginAsyncZod = async server => {
   server.get(
@@ -33,7 +44,10 @@ export const getUploadsRoute: FastifyPluginAsyncZod = async server => {
         },
       },
     },
-    async (request, reply) => {
+    async (
+      request: FastifyRequest<{ Querystring: QuerystringType }>,
+      reply
+    ) => {
       const { page, pageSize, searchQuery, sortBy, sortDirection } =
         request.query
 

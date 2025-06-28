@@ -1,26 +1,38 @@
 import { jsonSchemaTransform } from 'fastify-type-provider-zod'
 
-type TransformSwaggerSchemaDAta = Parameters<typeof jsonSchemaTransform>[0]
+type TransformSwaggerSchemaData = Parameters<typeof jsonSchemaTransform>[0]
 
-export function transformSwaggerSchema(data: TransformSwaggerSchemaDAta) {
-  const { schema, url } = jsonSchemaTransform(data)
+export function transformSwaggerSchema(data: TransformSwaggerSchemaData) {
+  const result = jsonSchemaTransform(data)
+  const schema = result.schema
 
-  // if (schema.consumes?.includes('multipart/form-data')) {
-  //   if (schema.body === undefined) {
-  //     schema.body = {
-  //       type: 'object',
-  //       required: [],
-  //       properties: {},
-  //     }
-  //   }
+  if (
+    schema &&
+    typeof schema === 'object' &&
+    Array.isArray(schema.consumes) &&
+    schema.consumes.includes('multipart/form-data')
+  ) {
+    schema.body = schema.body ?? {
+      type: 'object',
+      required: [],
+      properties: {},
+    }
 
-  //   schema.body.properties.file = {
-  //     type: 'string',
-  //     format: 'binary',
-  //   }
+    const body = schema.body as {
+      type: string
+      required: string[]
+      properties: Record<string, unknown>
+    }
 
-  //   schema.body.required.push('file')
-  // }
+    body.properties.file = {
+      type: 'string',
+      format: 'binary',
+    }
 
-  return { schema, url }
+    if (!body.required.includes('file')) {
+      body.required.push('file')
+    }
+  }
+
+  return result
 }
